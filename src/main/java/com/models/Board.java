@@ -16,7 +16,7 @@ public class Board {
                 sb.append(positionLetter).append(j + 1);
                 addWhiteCheckersOnBoard(sb.toString(), j, i);
                 if (j > 2 && j < 5) {
-                    addEmptySquareOnBoard(sb.toString(), j, i);
+                    addEmptyDarkSquareOnBoard(sb.toString(), j, i);
                 }
                 if (j > 4) {
                     addBlackCheckersOnBoard(sb.toString(), j, i);
@@ -39,7 +39,7 @@ public class Board {
         }
         return null;
     }
-
+// public Square(String position, boolean isEmpty, boolean isBlack, boolean isCheckerBlack) {
     public Square[][] getBoard() {
         return board;
     }
@@ -50,23 +50,23 @@ public class Board {
         }
         if (positionChar % 2 == 0) {
             if (numPosition % 2 == 0) {
-                board[positionChar][numPosition] = new Square(charName, false, true, false);
+                board[positionChar][numPosition] = new Square(charName, true,new Checker(false,false));
             }
         } else {
             if (numPosition % 2 != 0) {
-                board[positionChar][numPosition] = new Square(charName, false, true, false);
+                board[positionChar][numPosition] = new Square(charName, true,new Checker(false,false));
             }
         }
     }
 
-    private void addEmptySquareOnBoard(String charName, int positionChar, int numPosition) {
+    private void addEmptyDarkSquareOnBoard(String charName, int positionChar, int numPosition) {
         if (positionChar % 2 == 0) {
             if (numPosition % 2 == 0) {
-                board[positionChar][numPosition] = new Square(charName, true, true, false);
+                board[positionChar][numPosition] = new Square(charName, true,null);
             }
         } else {
             if (numPosition % 2 != 0) {
-                board[positionChar][numPosition] = new Square(charName, true, true, true);
+                board[positionChar][numPosition] = new Square(charName, true, null);
             }
         }
     }
@@ -74,11 +74,11 @@ public class Board {
     private void addBlackCheckersOnBoard(String charName, int positionChar, int numPosition) {
         if (positionChar % 2 != 0) {
             if (numPosition % 2 != 0) {
-                board[positionChar][numPosition] = new Square(charName, false, true, true);
+                board[positionChar][numPosition] = new Square(charName, true,new Checker(true,false));
             }
         } else {
             if (numPosition % 2 == 0) {
-                board[positionChar][numPosition] = new Square(charName, false, true, true);
+                board[positionChar][numPosition] = new Square(charName, true,new Checker(true,false));
             }
         }
     }
@@ -125,5 +125,33 @@ public class Board {
                 return 7;
         }
         throw new IllegalArgumentException();
+    }
+
+    public void printBoard() {
+        int k = 0;
+        for (int i = board.length - 1; i >= 0; i--) {
+            for (int j = 0; j < board.length; j++) {
+                if (j == 0 && k == 0) {
+                    k++;
+                    for(int z =0;z<8;z++){
+                    System.out.print(" "+getPositionChar(z)+" ");
+                    }
+                    System.out.println();
+                }
+                if (board[i][j] == null) {
+                    System.out.print("___");
+                    continue;
+                }
+
+                if (!board[i][j].isEmpty() && !board[i][j].getChecker().isCheckerBlack()) {
+                    System.out.print(" * ");
+                } else if (!board[i][j].isEmpty() && board[i][j].getChecker().isCheckerBlack()) {
+                    System.out.print(" & ");
+                } else if (board[i][j].isEmpty()) {
+                    System.out.print(" □ ");
+                }
+            }
+            System.out.println("   " + (i + 1));
+        }
     }
 }

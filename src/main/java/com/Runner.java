@@ -13,7 +13,7 @@ public class Runner {
 
 
         board.createCheckersOnBoard();
-        checkers.doMove(player1);
+        checkers.doMoveWight(player1);
 
     }
 }

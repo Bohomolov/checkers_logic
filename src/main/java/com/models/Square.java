@@ -3,37 +3,33 @@ package com.models;
 public class Square {
     private final String position;
     private final boolean isBlack;
-    private boolean isEmpty;
-    private boolean isCheckerBlack;
-    public Square(String position, boolean isEmpty, boolean isBlack, boolean isCheckerBlack) {
+    private Checker checker;
+    public Square(String position, boolean isBlack, Checker checker) {
         this.position = position;
-        this.isEmpty = isEmpty;
         this.isBlack = isBlack;
-        this.isCheckerBlack = isCheckerBlack;
+        this.checker = checker;
     }
 
     public String getPosition() {
         return position;
     }
 
-    public void setCheckerBlack(boolean checkerBlack) {
-        isCheckerBlack = checkerBlack;
-    }
+
 
     public boolean isBlack() {
         return isBlack;
     }
 
-    public boolean isEmpty() {
-        return isEmpty;
+    public void setChecker(Checker checker) {
+        this.checker = checker;
     }
 
-    public void setEmpty(boolean empty) {
-        isEmpty = empty;
+    public boolean isEmpty(){
+        return this.checker == null;
     }
 
-    public boolean isCheckerBlack() {
-        return isCheckerBlack;
+    public Checker getChecker() {
+        return checker;
     }
 
     @Override
@@ -41,8 +37,7 @@ public class Square {
         return "Square{" +
                 "position='" + position + '\'' +
                 ", isBlack=" + isBlack +
-                ", isEmpty=" + isEmpty +
-                ", isCheckerBlack=" + isCheckerBlack +
+                ", checker=" + checker +
                 '}';
     }
 }

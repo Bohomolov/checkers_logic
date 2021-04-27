@@ -6,6 +6,11 @@ public class Player {
     private final boolean isBlack;
     private final boolean isBot;
     private final String login;
+
+    public boolean isBlack() {
+        return isBlack;
+    }
+
     private boolean myChoose;
 
     public Player(boolean isBlack, boolean isBot, String login) {
