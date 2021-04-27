@@ -6,59 +6,60 @@ import com.models.Player;
 import com.models.Square;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Checkers {
     private final Scanner scanner = new Scanner(System.in);
     private final Board board;
-    private final Player player1;
-    private final Player player2;
+    private final Player player;
     private final Square[][] boardField;
+    private List<Checker> blackCheckers;
+    private List<Checker> whiteCheckers;
 
-    public Checkers(Board board, Player player1, Player player2) {
+    public Checkers(Board board, Player player) {
         this.board = board;
-        this.player1 = player1;
-        this.player2 = player2;
+        this.player = player;
         boardField = board.getBoard();
+        blackCheckers = board.getAllByColor(true);
+        whiteCheckers = board.getAllByColor(false);
     }
 
     public void doMoveWight(Player player) {
-        while (true) {
-            board.printBoard();
-            System.out.println("Select move");
-            String command = scanner.nextLine();
-            if (command.equalsIgnoreCase("exit")) {
-                break;
-            }
-            Square current = board.getSquare(command);
+        board.printBoard();
+        System.out.println("Select move");
+        System.out.println(player.getLogin() + " make chose");
+        String command = scanner.nextLine();
+        String[] moves = getImpossibleMove(command, player.isBlack());
+        moves = chekIsMoveValid(moves, player.isBlack(), command);
+        System.out.println("Your impossible move: " + Arrays.toString(moves));
+        String myChoseMove = scanner.nextLine();
+        if (moves != null) {
 
-            System.out.println("Player 1 make chose");
-            String[] moves = getImpossibleMove(command);
-            moves = chekIsMoveValid(moves, player.isBlack(), command);
-            System.out.println("Your impossible move: " + Arrays.toString(moves));
-            String myChoseMove = scanner.nextLine();
-            if (moves != null) {
-
-                if (myChoseMove.equals(moves[0]) || myChoseMove.equals(moves[1]) && !myChoseMove.equals("null")) {
-                    doingMove(command, myChoseMove);
-                }
+            if (myChoseMove.equals(moves[0]) || myChoseMove.equals(moves[1]) && !myChoseMove.equals("null")) {
+                doingMove(command, myChoseMove);
             }
+
         }
+
     }
 
-    public String[] getImpossibleMove(String move) {
+
+    public String[] getImpossibleMove(String move, boolean ourColorIsBlack) {
+
         Square currentSquare = board.getSquare(move);
         String[] impossibleMoves = new String[2];
         if (currentSquare == null || currentSquare.isEmpty()) {
             return null;
         }
         char currentLetter = move.charAt(0);
-        int currentNumber = Character.getNumericValue(move.charAt(1)) + 1;
+        int currentNumber = ourColorIsBlack ? Character.getNumericValue(move.charAt(1)) - 1 : Character.getNumericValue(move.charAt(1)) + 1;
 
         if (currentLetter == 'H') {
             impossibleMoves[0] = (board.getPositionChar(board.getPositionInt(currentLetter) - 1)) + "" + currentNumber;
             return impossibleMoves;
         }
+
         if (currentLetter == 'A') {
             impossibleMoves[0] = (board.getPositionChar(board.getPositionInt(currentLetter) + 1)) + "" + currentNumber;
             return impossibleMoves;
@@ -70,7 +71,7 @@ public class Checkers {
         return impossibleMoves;
     }
 
-    public String[] chekIsMoveValid(String[] move, boolean ourColor, String nowPosition) {
+    public String[] chekIsMoveValid(String[] move, boolean ourColorIsBlack, String nowPosition) {
         String[] res = new String[2];
         if (move == null) {
             return null;
@@ -83,11 +84,12 @@ public class Checkers {
             if (square.isEmpty()) {
                 return new String[]{move[0]};
             } else {
-                if (square.getChecker().isCheckerBlack() == ourColor) {
+                if (square.getChecker().isCheckerBlack() == ourColorIsBlack) {
                     return null;
                 } else {
                     Square fight = fightImpossible(nowPosition, move[0]);
                     if (fight != null && fight.isEmpty()) {
+                        board.getSquare(move[0]).setChecker(null);
                         return new String[]{fightImpossible(nowPosition, move[0]).getPosition()};
                     } else {
                         return new String[]{null};
@@ -100,11 +102,12 @@ public class Checkers {
             if (square.isEmpty()) {
                 return new String[]{move[1]};
             } else {
-                if (square.getChecker().isCheckerBlack() == ourColor) {
+                if (square.getChecker().isCheckerBlack() == ourColorIsBlack) {
                     return null;
                 } else {
                     Square fight = fightImpossible(nowPosition, move[1]);
                     if (fight != null && fight.isEmpty()) {
+                        board.getSquare(move[1]).setChecker(null);
                         return new String[]{fightImpossible(nowPosition, move[1]).getPosition()};
                     } else {
                         return new String[]{null};
@@ -118,14 +121,13 @@ public class Checkers {
             if (square.isEmpty()) {
                 res[0] = move[0];
             } else {
-                if (square.getChecker().isCheckerBlack() == ourColor) {
+                if (square.getChecker().isCheckerBlack() == ourColorIsBlack) {
                     res[0] = null;
                 } else {
                     Square fight = fightImpossible(nowPosition, move[0]);
                     if (fight != null && fight.isEmpty()) {
-                        res[0] =  fight.getPosition();
-                    }
-                    else {
+                        res[0] = fight.getPosition();
+                    } else {
                         res[0] = null;
                     }
                 }
@@ -133,20 +135,28 @@ public class Checkers {
             if (square2.isEmpty()) {
                 res[1] = move[1];
             } else {
-                if (square2.getChecker().isCheckerBlack() == ourColor) {
+                if (square2.getChecker().isCheckerBlack() == ourColorIsBlack) {
                     res[1] = null;
                 } else {
                     Square fight = fightImpossible(nowPosition, move[0]);
                     if (fight != null && fight.isEmpty()) {
-                        res[1] =  fight.getPosition();
-                    }
-                    else {
+                        res[1] = fight.getPosition();
+                    } else {
                         res[1] = null;
                     }
                 }
             }
         }
         return res;
+    }
+
+    public boolean ifWeAreHaveFight(boolean isOurColorBlack) {
+        if (isOurColorBlack) {
+            for (int i = 0; i < blackCheckers.size(); i++) {
+                blackCheckers.get(i)
+            }
+        }
+
     }
 
     public void doingMove(String myNowPosition, String movePosition) {

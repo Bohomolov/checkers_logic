@@ -1,6 +1,8 @@
 package com.models;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Board {
     private final int size = 64;
@@ -39,7 +41,8 @@ public class Board {
         }
         return null;
     }
-// public Square(String position, boolean isEmpty, boolean isBlack, boolean isCheckerBlack) {
+
+    // public Square(String position, boolean isEmpty, boolean isBlack, boolean isCheckerBlack) {
     public Square[][] getBoard() {
         return board;
     }
@@ -50,11 +53,11 @@ public class Board {
         }
         if (positionChar % 2 == 0) {
             if (numPosition % 2 == 0) {
-                board[positionChar][numPosition] = new Square(charName, true,new Checker(false,false));
+                board[positionChar][numPosition] = new Square(charName, true, new Checker(false, false));
             }
         } else {
             if (numPosition % 2 != 0) {
-                board[positionChar][numPosition] = new Square(charName, true,new Checker(false,false));
+                board[positionChar][numPosition] = new Square(charName, true, new Checker(false, false));
             }
         }
     }
@@ -62,7 +65,7 @@ public class Board {
     private void addEmptyDarkSquareOnBoard(String charName, int positionChar, int numPosition) {
         if (positionChar % 2 == 0) {
             if (numPosition % 2 == 0) {
-                board[positionChar][numPosition] = new Square(charName, true,null);
+                board[positionChar][numPosition] = new Square(charName, true, null);
             }
         } else {
             if (numPosition % 2 != 0) {
@@ -74,11 +77,27 @@ public class Board {
     private void addBlackCheckersOnBoard(String charName, int positionChar, int numPosition) {
         if (positionChar % 2 != 0) {
             if (numPosition % 2 != 0) {
-                board[positionChar][numPosition] = new Square(charName, true,new Checker(true,false));
+                board[positionChar][numPosition] = new Square(charName, true, new Checker(true, false));
             }
         } else {
             if (numPosition % 2 == 0) {
-                board[positionChar][numPosition] = new Square(charName, true,new Checker(true,false));
+                board[positionChar][numPosition] = new Square(charName, true, new Checker(true, false));
+            }
+        }
+    }
+
+    public List<Square> getAllByColor(boolean isColorBlack) {
+        List<Square> result = new ArrayList<>();
+        getAllBlackCheckers(result, isColorBlack);
+        return result;
+    }
+
+    private void getAllBlackCheckers(List<Square> result, boolean color) {
+        for (Square[] squares : board) {
+            for (int j = 0; j < board.length; j++) {
+                if (squares[j].getChecker().isCheckerBlack() == color) {
+                    result.add(squares[j]);
+                }
             }
         }
     }
@@ -133,8 +152,8 @@ public class Board {
             for (int j = 0; j < board.length; j++) {
                 if (j == 0 && k == 0) {
                     k++;
-                    for(int z =0;z<8;z++){
-                    System.out.print(" "+getPositionChar(z)+" ");
+                    for (int z = 0; z < 8; z++) {
+                        System.out.print(" " + getPositionChar(z) + " ");
                     }
                     System.out.println();
                 }

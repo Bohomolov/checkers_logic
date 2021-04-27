@@ -19,6 +19,10 @@ public class Player {
         this.login = login;
     }
 
+    public String getLogin() {
+        return login;
+    }
+
     public boolean isMyChoose() {
         return myChoose;
     }
