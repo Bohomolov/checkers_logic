@@ -95,7 +95,7 @@ public class Board {
     private void getAllBlackCheckers(List<Square> result, boolean color) {
         for (Square[] squares : board) {
             for (int j = 0; j < board.length; j++) {
-                if (squares[j].getChecker().isCheckerBlack() == color) {
+                if (squares[j] != null  &&squares[j].getChecker() != null && squares[j].getChecker().isCheckerBlack() == color) {
                     result.add(squares[j]);
                 }
             }

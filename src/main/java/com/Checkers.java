@@ -5,6 +5,7 @@ import com.models.Checker;
 import com.models.Player;
 import com.models.Square;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -14,19 +15,17 @@ public class Checkers {
     private final Board board;
     private final Player player;
     private final Square[][] boardField;
-    private List<Checker> blackCheckers;
-    private List<Checker> whiteCheckers;
 
     public Checkers(Board board, Player player) {
         this.board = board;
         this.player = player;
         boardField = board.getBoard();
-        blackCheckers = board.getAllByColor(true);
-        whiteCheckers = board.getAllByColor(false);
+
     }
 
     public void doMoveWight(Player player) {
         board.printBoard();
+        System.out.println(ifWeAreHaveFight(player.isBlack()));
         System.out.println("Select move");
         System.out.println(player.getLogin() + " make chose");
         String command = scanner.nextLine();
@@ -150,14 +149,88 @@ public class Checkers {
         return res;
     }
 
-    public boolean ifWeAreHaveFight(boolean isOurColorBlack) {
+    public List<String> ifWeAreHaveFight(boolean isOurColorBlack) {
+        List<String> res = new ArrayList<>();
         if (isOurColorBlack) {
-            for (int i = 0; i < blackCheckers.size(); i++) {
-                blackCheckers.get(i)
+            ifWeAreHaveFightForDifferentCollar(res, board.getAllByColor(true));
+        } else {
+            ifWeAreHaveFightForDifferentCollar(res, board.getAllByColor(false));
+        }
+        return res;
+    }
+
+    private void ifWeAreHaveFightForDifferentCollar(List<String> res, List<Square> squares) {
+        for (Square square : squares) {
+            String currentPos = square.getPosition();
+            char later = currentPos.charAt(0);
+            int num = Character.getNumericValue(currentPos.charAt(1));
+            char laterUpdate;
+            int numUpdate;
+
+            if (later == 'H') {
+                laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
+                numUpdate = num + 1;
+
+                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+
+                laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
+                numUpdate = num - 1;
+                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+                continue;
+
+            }
+            if (later == 'A') {
+                laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
+                numUpdate = num - 1;
+                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+                laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
+                numUpdate = num + 1;
+                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+                continue;
+
+            }
+            laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
+            numUpdate = num + 1;
+            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+
+            laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
+            numUpdate = num + 1;
+
+            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+
+//            laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
+//            numUpdate = num - 1;
+//            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+
+//            laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
+//            numUpdate = num - 1;
+//            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+
+        }
+    }
+
+    private void chekSide(List<String> res, char later, int num, char laterUpdate, int numUpdate, boolean ourColor) {
+        if (board.getSquare("" + laterUpdate + numUpdate) != null && !board.getSquare("" + laterUpdate + numUpdate).isEmpty()) {
+            if (ourColor != board.getSquare("" + laterUpdate + numUpdate).getChecker().isCheckerBlack()) {
+                char laterUpdate2;
+                if (board.getPositionInt(later) <= 5) {
+                    laterUpdate2 = board.getPositionChar(board.getPositionInt(later) + 2);
+                } else {
+                    return;
+                }
+                int numUpdate2;
+                if (num < 5) {
+                    numUpdate2 = numUpdate = num + 2;
+                } else {
+                    return;
+                }
+                if ( board.getSquare("" + laterUpdate + numUpdate)!=null&& board.getSquare("" + laterUpdate2 + numUpdate2) != null && board.getSquare("" + laterUpdate2 + numUpdate2).isEmpty()) {
+                    res.add(board.getSquare("" + laterUpdate + numUpdate).getPosition());
+                }
             }
         }
-
     }
+
 
     public void doingMove(String myNowPosition, String movePosition) {
         Square myNowChecker = board.getSquare(myNowPosition);
