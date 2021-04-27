@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public class Board {
     private final int size = 64;
+
     private final Square[][] board = new Square[8][8];
 
     public void createCheckersOnBoard() {
@@ -23,7 +24,24 @@ public class Board {
                 sb.delete(0, sb.length());
             }
         }
-        System.out.println(Arrays.deepToString(board));
+//        System.out.println(Arrays.deepToString(board));
+    }
+
+    public Square getSquare(String move) {
+        for (Square[] squares : board) {
+            for (int j = 0; j < board.length; j++) {
+                if (squares[j] != null) {
+                    if (squares[j].getPosition().equals(move)) {
+                        return squares[j];
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public Square[][] getBoard() {
+        return board;
     }
 
     private void addWhiteCheckersOnBoard(String charName, int positionChar, int numPosition) {
@@ -65,7 +83,7 @@ public class Board {
         }
     }
 
-    private char getPositionChar(int i) {
+    public char getPositionChar(int i) {
         switch (i) {
             case 0:
                 return 'A';
@@ -87,4 +105,25 @@ public class Board {
         throw new IllegalArgumentException();
     }
 
+    public int getPositionInt(char i) {
+        switch (i) {
+            case 'A':
+                return 0;
+            case 'B':
+                return 1;
+            case 'C':
+                return 2;
+            case 'D':
+                return 3;
+            case 'E':
+                return 4;
+            case 'F':
+                return 5;
+            case 'G':
+                return 6;
+            case 'H':
+                return 7;
+        }
+        throw new IllegalArgumentException();
+    }
 }
