@@ -5,10 +5,7 @@ import com.models.Checker;
 import com.models.Player;
 import com.models.Square;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Checkers {
     private final Scanner scanner = new Scanner(System.in);
@@ -149,88 +146,97 @@ public class Checkers {
         return res;
     }
 
-    public List<String> ifWeAreHaveFight(boolean isOurColorBlack) {
-        List<String> res = new ArrayList<>();
-        if (isOurColorBlack) {
-            ifWeAreHaveFightForDifferentCollar(res, board.getAllByColor(true));
+    public HashMap<String, String> ifWeAreHaveFight(boolean isOurColorBlack) {
+        HashMap<String, String> res = new HashMap<>();
+        if (!isOurColorBlack) {
+            ifWeAreHaveFightForDifferentCollar(res, board.getAllByColor(false), isOurColorBlack);
         } else {
-            ifWeAreHaveFightForDifferentCollar(res, board.getAllByColor(false));
+            ifWeAreHaveFightForDifferentCollar(res, board.getAllByColor(true), isOurColorBlack);
         }
         return res;
     }
 
-    private void ifWeAreHaveFightForDifferentCollar(List<String> res, List<Square> squares) {
+    private void ifWeAreHaveFightForDifferentCollar(HashMap<String, String> res, List<Square> squares, boolean ourColor) {
         for (Square square : squares) {
-            String currentPos = square.getPosition();
-            char later = currentPos.charAt(0);
-            int num = Character.getNumericValue(currentPos.charAt(1));
-            char laterUpdate;
-            int numUpdate;
+            char latter = square.getPosition().charAt(0);
+            int numCheck = Character.getNumericValue(square.getPosition().charAt(1));
+            char latterUpd;
+            int numUpd;
 
-            if (later == 'H') {
-                laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
-                numUpdate = num + 1;
+            if (board.getPositionInt(latter) < 6 && numCheck < 6) {
 
-                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+                latterUpd = board.getPositionChar(board.getPositionInt(latter) + 1);
+                numUpd = numCheck + 1;
 
-                laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
-                numUpdate = num - 1;
-                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
-                continue;
+                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
 
+                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
+                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) + 2);
+                    int numUpd2 = numCheck + 2;
+
+                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
+                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
+                        res.put(square.getPosition(),nexAfterChecked.getPosition());
+                    }
+
+
+                }
             }
-            if (later == 'A') {
-                laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
-                numUpdate = num - 1;
-                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
-                laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
-                numUpdate = num + 1;
-                chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
-                continue;
+            if (board.getPositionInt(latter) >= 2 && numCheck < 6) {
 
+                latterUpd = board.getPositionChar(board.getPositionInt(latter) - 1);
+                numUpd = numCheck + 1;
+
+                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
+
+                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
+                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) - 2);
+                    int numUpd2 = numCheck + 2;
+
+                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
+                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
+                        res.put(square.getPosition(),nexAfterChecked.getPosition());
+                    }
+                }
             }
-            laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
-            numUpdate = num + 1;
-            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+            if (board.getPositionInt(latter) < 6 && numCheck >= 2) {
 
-            laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
-            numUpdate = num + 1;
+                latterUpd = board.getPositionChar(board.getPositionInt(latter) + 1);
+                numUpd = numCheck - 1;
 
-            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
 
-//            laterUpdate = board.getPositionChar(board.getPositionInt(later) - 1);
-//            numUpdate = num - 1;
-//            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
+                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) + 2);
+                    int numUpd2 = numCheck - 2;
 
-//            laterUpdate = board.getPositionChar(board.getPositionInt(later) + 1);
-//            numUpdate = num - 1;
-//            chekSide(res, later, num, laterUpdate, numUpdate, square.isBlack());
+                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
+                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
+                        res.put(square.getPosition(),nexAfterChecked.getPosition());
+                    }
+                }
+            }
+
+            if (board.getPositionInt(latter) >= 2 && numCheck >= 2) {
+
+                latterUpd = board.getPositionChar(board.getPositionInt(latter) - 1);
+                numUpd = numCheck - 1;
+
+                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
+
+                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
+                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) - 2);
+                    int numUpd2 = numCheck - 2;
+
+                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
+                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
+                        res.put(square.getPosition(),nexAfterChecked.getPosition());
+                    }
+                }
+            }
 
         }
     }
-
-    private void chekSide(List<String> res, char later, int num, char laterUpdate, int numUpdate, boolean ourColor) {
-        if (board.getSquare("" + laterUpdate + numUpdate) != null && !board.getSquare("" + laterUpdate + numUpdate).isEmpty()) {
-            if (ourColor != board.getSquare("" + laterUpdate + numUpdate).getChecker().isCheckerBlack()) {
-                char laterUpdate2;
-                if (board.getPositionInt(later) <= 5) {
-                    laterUpdate2 = board.getPositionChar(board.getPositionInt(later) + 2);
-                } else {
-                    return;
-                }
-                int numUpdate2;
-                if (num < 5) {
-                    numUpdate2 = numUpdate = num + 2;
-                } else {
-                    return;
-                }
-                if ( board.getSquare("" + laterUpdate + numUpdate)!=null&& board.getSquare("" + laterUpdate2 + numUpdate2) != null && board.getSquare("" + laterUpdate2 + numUpdate2).isEmpty()) {
-                    res.add(board.getSquare("" + laterUpdate + numUpdate).getPosition());
-                }
-            }
-        }
-    }
-
 
     public void doingMove(String myNowPosition, String movePosition) {
         Square myNowChecker = board.getSquare(myNowPosition);
