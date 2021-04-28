@@ -7,8 +7,8 @@ import com.models.Player;
 public class Runner {
     public static void main(String[] args) {
         Board board = new Board();
-        Player player1 = new Player(false, false, "vitalik");
-        Player player2 = new Player(true, false, "Igor");
+        Player player1 = new Player(false, false, "White");
+        Player player2 = new Player(true, false, "Black");
 
         Checkers checkers = new Checkers(board, player1);
         Checkers checkers2 = new Checkers(board, player2);

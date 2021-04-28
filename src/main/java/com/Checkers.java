@@ -1,7 +1,6 @@
 package com;
 
 import com.models.Board;
-import com.models.Checker;
 import com.models.Player;
 import com.models.Square;
 
@@ -11,40 +10,43 @@ public class Checkers {
     private final Scanner scanner = new Scanner(System.in);
     private final Board board;
     private final Player player;
-    private final Square[][] boardField;
+    private HashMap<HashMap<String, String>, List<String>> chooses;
 
     public Checkers(Board board, Player player) {
         this.board = board;
         this.player = player;
-        boardField = board.getBoard();
 
     }
 
     public void doMoveWight(Player player) {
         board.printBoard();
-        System.out.println(ifWeAreHaveFight(player.isBlack()));
+        chooses = ifWeAreHaveFight(player.isBlack());
+        System.out.println(chooses);
         System.out.println("Select move");
         System.out.println(player.getLogin() + " make chose");
         String command = scanner.nextLine();
-        String[] moves = getImpossibleMove(command, player.isBlack());
-        moves = chekIsMoveValid(moves, player.isBlack(), command);
-        System.out.println("Your impossible move: " + Arrays.toString(moves));
+        List<String> moves = getImpossibleMove(command, player.isBlack());
+//        moves = chekIsMoveValid(moves, player.isBlack(), command);
+        if (chooses.size() != 0 && chooses.get()) {
+            moves = chooses.get(command);
+
+        }
+        System.out.println("Your impossible move: " + moves + " " + chooses);
         String myChoseMove = scanner.nextLine();
         if (moves != null) {
 
-            if (myChoseMove.equals(moves[0]) || myChoseMove.equals(moves[1]) && !myChoseMove.equals("null")) {
+            if (myChoseMove.equals(moves.get(0)) || myChoseMove.equals(moves.get(1)) && !myChoseMove.equals("null")) {
                 doingMove(command, myChoseMove);
             }
-
         }
 
     }
 
 
-    public String[] getImpossibleMove(String move, boolean ourColorIsBlack) {
+    public List<String> getImpossibleMove(String move, boolean ourColorIsBlack) {
 
         Square currentSquare = board.getSquare(move);
-        String[] impossibleMoves = new String[2];
+        List<String> impossibleMoves = new ArrayList<>();
         if (currentSquare == null || currentSquare.isEmpty()) {
             return null;
         }
@@ -52,17 +54,17 @@ public class Checkers {
         int currentNumber = ourColorIsBlack ? Character.getNumericValue(move.charAt(1)) - 1 : Character.getNumericValue(move.charAt(1)) + 1;
 
         if (currentLetter == 'H') {
-            impossibleMoves[0] = (board.getPositionChar(board.getPositionInt(currentLetter) - 1)) + "" + currentNumber;
+            impossibleMoves.add(board.getPositionChar(board.getPositionInt(currentLetter) - 1) + "" + currentNumber);
             return impossibleMoves;
         }
 
         if (currentLetter == 'A') {
-            impossibleMoves[0] = (board.getPositionChar(board.getPositionInt(currentLetter) + 1)) + "" + currentNumber;
+            impossibleMoves.add(board.getPositionChar(board.getPositionInt(currentLetter) + 1) + "" + currentNumber);
             return impossibleMoves;
         }
 
-        impossibleMoves[0] = (board.getPositionChar(board.getPositionInt(currentLetter) - 1)) + "" + currentNumber;
-        impossibleMoves[1] = (board.getPositionChar(board.getPositionInt(currentLetter) + 1)) + "" + currentNumber;
+        impossibleMoves.add(board.getPositionChar(board.getPositionInt(currentLetter) - 1) + "" + currentNumber);
+        impossibleMoves.add(board.getPositionChar(board.getPositionInt(currentLetter) + 1) + "" + currentNumber);
 
         return impossibleMoves;
     }
@@ -146,8 +148,9 @@ public class Checkers {
         return res;
     }
 
-    public HashMap<String, String> ifWeAreHaveFight(boolean isOurColorBlack) {
-        HashMap<String, String> res = new HashMap<>();
+    public HashMap<HashMap<String, String>, List<String>> ifWeAreHaveFight(boolean isOurColorBlack) {
+        HashMap<HashMap<String, String >, List<String>> res = new HashMap<>();
+
         if (!isOurColorBlack) {
             ifWeAreHaveFightForDifferentCollar(res, board.getAllByColor(false), isOurColorBlack);
         } else {
@@ -156,85 +159,50 @@ public class Checkers {
         return res;
     }
 
-    private void ifWeAreHaveFightForDifferentCollar(HashMap<String, String> res, List<Square> squares, boolean ourColor) {
+    private void ifWeAreHaveFightForDifferentCollar(HashMap<HashMap<String, String>, List<String>> res, List<Square> squares, boolean ourColor) {
         for (Square square : squares) {
+            List<String> currentList = new ArrayList<>();
             char latter = square.getPosition().charAt(0);
             int numCheck = Character.getNumericValue(square.getPosition().charAt(1));
             char latterUpd;
             int numUpd;
 
             if (board.getPositionInt(latter) < 6 && numCheck < 6) {
-
                 latterUpd = board.getPositionChar(board.getPositionInt(latter) + 1);
                 numUpd = numCheck + 1;
-
-                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
-
-                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
-                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) + 2);
-                    int numUpd2 = numCheck + 2;
-
-                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
-                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
-                        res.put(square.getPosition(),nexAfterChecked.getPosition());
-                    }
-
-
-                }
+                checkDestination(res, currentList, square.getPosition(), latter, numCheck, latterUpd, numUpd, ourColor, 2, 2);
             }
             if (board.getPositionInt(latter) >= 2 && numCheck < 6) {
-
                 latterUpd = board.getPositionChar(board.getPositionInt(latter) - 1);
                 numUpd = numCheck + 1;
-
-                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
-
-                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
-                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) - 2);
-                    int numUpd2 = numCheck + 2;
-
-                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
-                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
-                        res.put(square.getPosition(),nexAfterChecked.getPosition());
-                    }
-                }
+                checkDestination(res, currentList, square.getPosition(), latter, numCheck, latterUpd, numUpd, ourColor, -2, 2);
             }
             if (board.getPositionInt(latter) < 6 && numCheck >= 2) {
-
                 latterUpd = board.getPositionChar(board.getPositionInt(latter) + 1);
                 numUpd = numCheck - 1;
-
-                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
-
-                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
-                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) + 2);
-                    int numUpd2 = numCheck - 2;
-
-                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
-                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
-                        res.put(square.getPosition(),nexAfterChecked.getPosition());
-                    }
-                }
+                checkDestination(res, currentList, square.getPosition(), latter, numCheck, latterUpd, numUpd, ourColor, 2, -2);
             }
-
             if (board.getPositionInt(latter) >= 2 && numCheck >= 2) {
-
                 latterUpd = board.getPositionChar(board.getPositionInt(latter) - 1);
                 numUpd = numCheck - 1;
-
-                Square checkedSq = board.getSquare("" + latterUpd + numUpd);
-
-                if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != ourColor) {
-                    char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) - 2);
-                    int numUpd2 = numCheck - 2;
-
-                    Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
-                    if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
-                        res.put(square.getPosition(),nexAfterChecked.getPosition());
-                    }
-                }
+                checkDestination(res, currentList, square.getPosition(), latter, numCheck, latterUpd, numUpd, ourColor, -2, -2);
             }
 
+        }
+    }
+
+    private void checkDestination(HashMap<HashMap<String, String>, List<String>> res, List<String> currentList, String squarePosition, char latter, int numCheck, char letterUpdate, int numUpdate, boolean color, int newPositionChar, int newPositionNum) {
+        HashMap<String, String> currentAndFightingCheckers = new HashMap<>();
+        Square checkedSq = board.getSquare("" + letterUpdate + numUpdate);
+        if (checkedSq != null && !checkedSq.isEmpty() && checkedSq.getChecker().isCheckerBlack() != color) {
+            char latterUpd2 = board.getPositionChar(board.getPositionInt(latter) + newPositionChar);
+            int numUpd2 = numCheck + newPositionNum;
+            Square nexAfterChecked = board.getSquare("" + latterUpd2 + numUpd2);
+            if (nexAfterChecked != null && nexAfterChecked.isEmpty()) {
+                currentList.add(nexAfterChecked.getPosition());
+                currentAndFightingCheckers.put(squarePosition, checkedSq.getPosition());
+                res.put(currentAndFightingCheckers, currentList);
+            }
         }
     }
 
@@ -259,7 +227,6 @@ public class Checkers {
         }
         if (board.getPositionInt(latter) > board.getPositionInt(witchCheckerWantFight.charAt(0))) {
             square = checkRiteSide(latter, nuwCheckerPos);
-
         } else {
             square = checkLeftSide(latter, nuwCheckerPos);
         }
